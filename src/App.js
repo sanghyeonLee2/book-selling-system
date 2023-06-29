@@ -1,23 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./routes/Home";
+import Detail from "./routes/Detail";
+import Cart from "./routes/Cart";
+import LogIn from "./routes/LogIn";
+import SignUp from "./routes/SignUp";
+import AdminLogIn from "./admin/AdminLogIn";
+
+//axios모듈에서 axios함수를 불러온다. ($ajax랑 거의 같다)
+//쓰는 이유는 서버에 대이터를 요청할 떄 비동기적으로 하기 위해
+//함수형 컴포넌트
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/logIn/" element={<LogIn />} />
+          <Route path="/logIn/signUp/" element={<SignUp />} />
+          <Route path="/adminLogIn/" element={<AdminLogIn />} />
+          <Route path="/book/:id" element={<Detail />} />
+          <Route path="/book/cart/" element={<Cart />} />
+        </Routes>
+      </Router>
     </div>
   );
 }
