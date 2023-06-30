@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import Books from "../component/Books";
 import bookData from "../data/bookData.json";
 import { Link } from "react-router-dom";
-import LogOut from "../component/LogOut";
 import axios from "axios";
 import styled, { createGlobalStyle } from "styled-components";
-
+import LogOut from "../component/LogOut";
 const GlobalStyle = createGlobalStyle`
   ul {
     list-style-type: none; /* 리스트 스타일을 없앰 */
@@ -53,8 +52,11 @@ const Header = styled.div`
     right: 12px;
     margin: 0;
   }
+  .tab-menu {
+  }
   > span.logo {
     position: absolute;
+
     left: 60px;
   }
   > div.isLogIn {
@@ -89,7 +91,7 @@ function Home() {
   const [search, setSearch] = useState([]);
   const [user, setUser] = useState(null);
   const [isLogIn, setIsLogIn] = useState(false);
-
+  const [isTabUserMenu, setIsTabUserMenu] = useState(false);
   useEffect(() => {
     axios({
       url: "http://localhost:3001/logIn/success",
@@ -119,6 +121,14 @@ function Home() {
     );
   };
 
+  const tabUserMenu = () => {
+    isTabUserMenu ? setIsTabUserMenu(false) : setIsTabUserMenu(true);
+  };
+
+  const logOut = () => {};
+
+  console.log(isTabUserMenu);
+
   return (
     <div>
       <GlobalStyle />
@@ -142,8 +152,19 @@ function Home() {
             </form>
             {isLogIn ? (
               <div className="isLogIn">
-                <strong>{user.userName}님 반갑습니다</strong>
-                <LogOut />
+                <ul>
+                  <li className="tab-menu">
+                    <button type="button" onClick={tabUserMenu}>
+                      {user.userName}님
+                    </button>
+                  </li>
+                  {isTabUserMenu ? (
+                    <>
+                      <li>마이페이지</li>
+                      <li onClick={logOut}>로그아웃</li>
+                    </>
+                  ) : null}
+                </ul>
               </div>
             ) : (
               <div>
