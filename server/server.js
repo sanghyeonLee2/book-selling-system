@@ -13,13 +13,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 const cors = require("cors");
 const PORT = process.env.PORT || 3001;
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-    credentials: true, //쿠키정보 사용하기 위해서
-  })
-);
 
 app.use(
   session({
@@ -35,8 +28,16 @@ app.use(
   })
 );
 
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+    credentials: true, //쿠키정보 사용하기 위해서
+  })
+);
+
 app.post("/register", (req, res) => {
-  const { name, id, pw } = req.body;
+  const { name, id, password } = req.body;
   userDb.query(`SELECT * FROM users WHERE id = ${id}`, (err, result) => {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -45,7 +46,7 @@ app.post("/register", (req, res) => {
     } else {
       userDb.query(
         "INSERT INTO users (name, id, pw) VALUES (?, ?, ?)",
-        [name, id, pw],
+        [name, id, password],
         (err, result) => {
           if (err) {
             console.log(err);
@@ -64,32 +65,9 @@ app.listen(PORT, () => {
 });
 
 app.post("/login", (req, res) => {
-  const { id, pw } = req.body;
+  const { id, password } = req.body;
   userDb.query(
-    `SELECT * FROM users WHERE id = ${id} AND pw = ${pw}`,
-    (err, userInfo) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send("Session save error");
-        return;
-      }
-      req.session.save(() => {
-        req.session.user = {
-          userId: userInfo[0].id,
-          userName: userInfo[0].name,
-        };
-        const data = req.session;
-        console.log(data);
-        res.status(200).json({ data });
-      });
-    }
-  );
-});
-
-app.post("/adminLogin", (req, res) => {
-  const { id, pw } = req.body;
-  userDb.query(
-    `SELECT * FROM admin WHERE id = ${id} AND pw = ${pw}`,
+    `SELECT * FROM users WHERE id = ${id} AND pw = ${password}`,
     (err, userInfo) => {
       if (err) {
         console.error(err);
@@ -111,6 +89,7 @@ app.post("/adminLogin", (req, res) => {
 
 app.post("/insertBook", (req, res) => {
   const { bookTitle, bookPrice, bookPublish, bookWriter } = req.body;
+  console.log(req.body);
   userDb.query(
     `SELECT * FROM book WHERE title = ${bookTitle} AND writer = ${bookWriter}`,
     (err, result) => {
@@ -134,6 +113,16 @@ app.post("/insertBook", (req, res) => {
       }
     }
   );
+});
+
+app.get("/searchBook", (req, res) => {
+  userDb.query(`SELECT * FROM book`, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json(result);
+    }
+  });
 });
 
 app.post("/logOut", (req, res) => {
