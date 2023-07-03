@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 function LogIn() {
   const [id, setId] = useState("");
-
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
@@ -14,13 +13,14 @@ function LogIn() {
     axios({
       url: "http://localhost:3001/login",
       method: "POST",
-      withCredentials: true,
+      withCredentials: true, //쿠키나 인증 헤더 정보를 포함시켜 요청하고 싶을때 클라이언트에서 API 요청 메소드를 보낼때 withCredentials 옵션을 true로 설정
       data: {
-        id: id,
-        pw: password,
+        id,
+        password,
       },
     }).then((result, err) => {
       if (result.status === 200) {
+        console.log(result);
         navigate("/");
       } else {
         console.log(err);

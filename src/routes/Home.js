@@ -4,13 +4,11 @@ import bookData from "../data/bookData.json";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import styled, { createGlobalStyle } from "styled-components";
-import LogOut from "../component/LogOut";
 const GlobalStyle = createGlobalStyle`
-  ul {
+  ul,li {
     list-style-type: none; /* 리스트 스타일을 없앰 */
   }
 `;
-
 const Container = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -24,15 +22,68 @@ const Container = styled.div`
   align-items: center;
 `;
 const Header = styled.div`
-  margin: 10px;
   display: flex;
   flex-direction: row;
   align-items: center;
+  padding: 13px;
   form.search {
     position: relative;
     width: 500px;
   }
-  button {
+
+  .menu-wrap {
+    position: relative;
+  }
+
+  .menu-wrap .dep1 {
+    position: absolute;
+    left: 500px;
+    top: -35px;
+  }
+
+  .menu-wrap .dep1 > li {
+    display: inline-block;
+    vertical-align: top;
+    width: 100px;
+    backgraound: #ddd;
+    text-align: center;
+  }
+
+  .menu-wrap .dep1 > li > span {
+    background: black;
+    color: white;
+    cursor: pointer;
+    display: block;
+    padding: 10px;
+    border: 1px solid;
+    box-shadow: 1px gray;
+    border-radius: 21px;
+  }
+  .menu-wrap .dep2 {
+    padding: 0px;
+    background: white;
+    box-shadow: 1px gray;
+    border: 1px solid;
+    border-radius: 8px;
+    display: none;
+  }
+  .menu-wrap .dep2 span {
+    cursor: pointer;
+    padding: 10px 0;
+    display: block;
+    text-align: center;
+  }
+  .menu-wrap .dep1 > li:hover > span {
+    box-shadow: 2px 2px 2px 1px gray;
+  }
+  .menu-wrap .dep1 > li:hover > .dep2 {
+    display: block;
+  }
+  .menu-wrap .dep2 span:hover {
+    text-decoration: underline;
+  }
+
+  #noneImg {
     background: none;
     border: none;
     padding: 0;
@@ -45,23 +96,17 @@ const Header = styled.div`
     border-radius: 8px;
     padding: 10px 12px;
   }
+  #logo {
+    position: absolute;
+    left: 70px;
+  }
+
   img {
     position: absolute;
     width: 17px;
     top: 10px;
     right: 12px;
     margin: 0;
-  }
-  .tab-menu {
-  }
-  > span.logo {
-    position: absolute;
-
-    left: 60px;
-  }
-  > div.isLogIn {
-    position: absolute;
-    right: 60px;
   }
 `;
 const LogInSection = styled.div`
@@ -91,7 +136,8 @@ function Home() {
   const [search, setSearch] = useState([]);
   const [user, setUser] = useState(null);
   const [isLogIn, setIsLogIn] = useState(false);
-  const [isTabUserMenu, setIsTabUserMenu] = useState(false);
+  const [adminRight, setAdminRight] = useState(false);
+
   useEffect(() => {
     axios({
       url: "http://localhost:3001/logIn/success",
@@ -101,10 +147,21 @@ function Home() {
       if (result.data.user) {
         setIsLogIn(true);
         setUser({
+          adminRight: result.data.user.adminRight,
           userName: result.data.user.userName,
           id: result.data.user.id,
         });
       }
+    });
+  }, []);
+
+  useEffect(() => {
+    axios({
+      url: "http://localhost:3001/searchBook",
+      method: "GET",
+      withCredentials: true,
+    }).then((res) => {
+      console.log(res.data);
     });
   }, []);
 
@@ -121,13 +178,19 @@ function Home() {
     );
   };
 
-  const tabUserMenu = () => {
-    isTabUserMenu ? setIsTabUserMenu(false) : setIsTabUserMenu(true);
+  const logOut = () => {
+    //세션 삭제
+    axios({
+      url: "http://localhost:3001/logOut",
+      method: "POST",
+      withCredentials: true,
+    }).then((result) => {
+      if (result.status === 200) {
+        console.log("성공");
+        setIsLogIn(false);
+      }
+    });
   };
-
-  const logOut = () => {};
-
-  console.log(isTabUserMenu);
 
   return (
     <div>
@@ -135,15 +198,17 @@ function Home() {
       <Container>
         <div>
           <Header>
-            <span className="logo">DN 문고</span>
-            <form onSubmit={onSubmit} className="search">
+            <span className="header-section" id="logo">
+              DN 문고
+            </span>
+            <form onSubmit={onSubmit} className="search header-section">
               <input
                 type="search"
                 name="text"
                 required
                 className="search-form"
               />
-              <button type="submit">
+              <button type="submit" id="noneImg" className="header-section">
                 <img
                   src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png"
                   alt="버튼"
@@ -151,19 +216,21 @@ function Home() {
               </button>
             </form>
             {isLogIn ? (
-              <div className="isLogIn">
-                <ul>
-                  <li className="tab-menu">
-                    <button type="button" onClick={tabUserMenu}>
-                      {user.userName}님
-                    </button>
+              <div className="menu-wrap">
+                <ul className="dep1">
+                  <li>
+                    <span>{user.userName}님</span>
+                    <ul className="dep2">
+                      <li>
+                        <span>마이페이지</span>
+                      </li>
+                      <li>
+                        <div>
+                          <span onClick={logOut}>로그아웃</span>
+                        </div>
+                      </li>
+                    </ul>
                   </li>
-                  {isTabUserMenu ? (
-                    <>
-                      <li>마이페이지</li>
-                      <li onClick={logOut}>로그아웃</li>
-                    </>
-                  ) : null}
                 </ul>
               </div>
             ) : (
@@ -171,9 +238,6 @@ function Home() {
                 <LogInSection>
                   <Link to={`/logIn/`}>
                     <span>로그인</span>
-                  </Link>
-                  <Link to={`/adminlogIn/`}>
-                    <span>관리자 로그인</span>
                   </Link>
                 </LogInSection>
               </div>
