@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import Books from "../component/Books";
-import bookData from "../data/bookData.json";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import styled, { createGlobalStyle } from "styled-components";
+import Mypage from "../component/Mypage";
 const GlobalStyle = createGlobalStyle`
   ul,li {
     list-style-type: none; /* 리스트 스타일을 없앰 */
@@ -132,10 +132,11 @@ const FieldSection = styled.div`
   }
 `;
 function Home() {
-  const bookList = bookData.bookList;
   const [search, setSearch] = useState([]);
   const [user, setUser] = useState(null);
   const [isLogIn, setIsLogIn] = useState(false);
+  const [showBooks, setShowBooks] = useState();
+  const [goMyPage, setGoMypage] = useState(false);
   const [adminRight, setAdminRight] = useState(false);
 
   useEffect(() => {
@@ -160,22 +161,30 @@ function Home() {
       url: "http://localhost:3001/searchBook",
       method: "GET",
       withCredentials: true,
-    }).then((res) => {
-      console.log(res.data);
-    });
+    })
+      .then((res) => {
+        setShowBooks(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
 
   const onClick = (event) => {
     // 클릭된 엘리먼트가 li 태그인 경우에만 처리
     setSearch(
-      bookList.filter((book) => book.genre.includes(event.target.textContent))
+      showBooks.filter((book) => book.genre.includes(event.target.textContent))
     );
   };
   const onSubmit = (event) => {
     event.preventDefault();
     setSearch(
-      bookList.filter((book) => book.title.includes(event.target.text.value))
+      showBooks.filter((book) => book.title.includes(event.target.text.value))
     );
+  };
+
+  const enterMypage = () => {
+    setGoMypage(true);
   };
 
   const logOut = () => {
@@ -198,7 +207,11 @@ function Home() {
       <Container>
         <div>
           <Header>
-            <span className="header-section" id="logo">
+            <span
+              className="header-section"
+              id="logo"
+              onClick={() => setGoMypage(false)}
+            >
               DN 문고
             </span>
             <form onSubmit={onSubmit} className="search header-section">
@@ -222,7 +235,7 @@ function Home() {
                     <span>{user.userName}님</span>
                     <ul className="dep2">
                       <li>
-                        <span>마이페이지</span>
+                        <span onClick={enterMypage}>마이페이지</span>
                       </li>
                       <li>
                         <div>
@@ -254,7 +267,7 @@ function Home() {
               </li>
               <li
                 onClick={() => {
-                  setSearch(bookList.slice(0, 0));
+                  setSearch(showBooks.slice(0, 0));
                 }}
               >
                 <h2>종합</h2>
@@ -290,7 +303,11 @@ function Home() {
           </FieldSection>
         </div>
         <div>
-          <Books searchBook={search} />
+          {goMyPage ? (
+            <Mypage />
+          ) : (
+            <Books searchBook={search} showBooks={showBooks} />
+          )}
         </div>
       </Container>
     </div>
