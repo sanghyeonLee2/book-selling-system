@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import bookData from "../data/bookData.json";
 import { useNavigate } from "react-router-dom";
 import InsertBook from "./InsertBook";
 import styled from "styled-components";
@@ -17,9 +16,8 @@ const AlignBooks = styled.div`
     margin: 10px;
   }
 `;
-function Books({ searchBook = [] }) {
+function Books({ searchBook = [], showBooks = [] }) {
   const navigate = useNavigate();
-  const bookList = bookData.bookList;
   const [cart, setCart] = useState([]);
   const [showInsertBook, setShowInsertBook] = useState(false);
   //useEffect사용
@@ -44,37 +42,46 @@ function Books({ searchBook = [] }) {
       <AlignBooks>
         {searchBook.length !== 0
           ? searchBook.map((book) => (
-              <div key={book.id} className="book">
-                <h2>
+              <div key={book.num} className="book">
+                {console.log(book)}
+                <h3>
                   <input
                     type="checkbox"
                     onChange={(e) => {
                       console.log(e.target);
                     }}
                   />
-                  <Link to={`/book/${book.id}`}>{book.title}</Link>
-                </h2>
-                <p>가격 : {book.price}</p>
-                <p>출판사 : {book.publisher}</p>
+                  <Link to={`/book/${book.num}`}>{book.title}</Link>
+                </h3>
+                <p>가격 : {book.price}원</p>
+                <p>출판사 : {book.publish}</p>
                 <p>작가 : {book.writer}</p>
-                <p>평점 : {book.rate}</p>
+                <p>평점 : {book.rating}</p>
               </div>
             ))
-          : bookList.map((book) => (
-              <div key={book.id} className="book">
-                <h2>
+          : showBooks.map((book) => (
+              <div key={book.num} className="book">
+                <h3>
                   <input
                     type="checkbox"
                     onChange={(e) => {
                       checked(e, book);
                     }}
                   />
-                  <Link to={`/book/${book.id}`}>{book.title}</Link>
-                </h2>
-                <p>가격 : {book.price}</p>
-                <p>출판사 : {book.publisher}</p>
+                  <Link to={`/book/${book.num}`}>{book.title}</Link>
+                </h3>
+                <img
+                  id="hz"
+                  src="https://source.unsplash.com/random"
+                  alt="랜덤짤"
+                  width="210
+                  "
+                  height="250"
+                ></img>
+                <p>가격 : {book.price}원</p>
+                <p>출판사 : {book.publish}</p>
                 <p>작가 : {book.writer}</p>
-                <p>평점 : {book.rate}</p>
+                <p>평점 : {book.rating}</p>
               </div>
             ))}
       </AlignBooks>
