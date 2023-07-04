@@ -45,7 +45,7 @@ app.post("/register", (req, res) => {
       res.json(true);
     } else {
       userDb.query(
-        "INSERT INTO users (name, id, pw) VALUES (?, ?, ?)",
+        "INSERT INTO users (name, id, pwassword) VALUES (?, ?, ?)",
         [name, id, password],
         (err, result) => {
           if (err) {
@@ -67,7 +67,7 @@ app.listen(PORT, () => {
 app.post("/login", (req, res) => {
   const { id, password } = req.body;
   userDb.query(
-    `SELECT * FROM users WHERE id = ${id} AND pw = ${password}`,
+    `SELECT * FROM users WHERE id = ${id} AND password = ${password}`,
     (err, userInfo) => {
       if (err) {
         console.error(err);
