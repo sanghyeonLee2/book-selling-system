@@ -1,28 +1,28 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom"; //useNavigate는 URL주소를 변경할 때 사용하는 Hook
+import { Link } from "react-router-dom"; //useNavigate는 URL주소를 변경할 때 사용하는 Hook
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function SignUp() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
-  const [id, setId] = useState("");
-  const [pw, setPw] = useState("");
+  const [num, setNum] = useState("");
+  const [password, setPassword] = useState("");
   const [pwCheck, setPwCheck] = useState("");
 
   const register = (e) => {
     e.preventDefault();
-    if (pwCheck !== pw) {
+    if (pwCheck !== password) {
       alert("입력된 비밀번호가 다릅니다.");
       return;
     } else {
-      const user = { name, id, pw };
+      const user = { name, num, password };
       axios
         .post("http://localhost:3001/register", user)
         .then((res) => {
           if (res.data === true) {
             console.log(res.data);
-            alert("아이디가 중복되었습니다.");
+            alert("회원번호가 중복되었습니다.");
           } else {
             console.log(res.data);
             alert("회원가입이 완료되었습니다.");
@@ -31,8 +31,8 @@ function SignUp() {
         })
         .catch((err) => console.log(err));
       setName("");
-      setId("");
-      setPw("");
+      setNum("");
+      setPassword("");
     }
   };
   return (
@@ -60,19 +60,20 @@ function SignUp() {
               />
             </li>
             <li id="id">
-              아이디
+              회원번호
               <input
                 type="text"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
+                value={num}
+                onChange={(e) => setNum(e.target.value)}
               />
             </li>
             <li id="pw">
               비밀번호
               <input
                 type="password"
-                value={pw}
-                onChange={(e) => setPw(e.target.value)}
+                autoComplete="off"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </li>
             <li>
@@ -80,6 +81,7 @@ function SignUp() {
               <input
                 type="password"
                 value={pwCheck}
+                autoComplete="off"
                 onChange={(e) => setPwCheck(e.target.value)}
               />
             </li>
